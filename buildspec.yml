@@ -2,9 +2,13 @@ version: 0.1
 phases:
   install:
     commands:
-      - npm install time
+      - npm install
       - aws cloudformation package --template-file samTemplate.yaml --s3-bucket ${ARTIFACT_BUCKET} 
                                    --output-template-file NewSamTemplate.yaml
+  post_build:
+    commands:
+      - aws cloudformation deploy --template-file NewSamTemplate.yaml --stack-name ${STACK_NAME} 
+                                  --capabilities CAPABILITY_IAM
 artifacts:
   type: zip
   files:
