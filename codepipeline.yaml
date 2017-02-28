@@ -13,7 +13,7 @@ Parameters:
   GitHubRepo:
     Type: String
     Description: Github repo name (e.g. github.com/Org/RepoName then RepoName)
-    Default: ngp-aws-sam
+    Default: nginx
   GitHubBranch:
     Type: String
     Default: master
@@ -24,13 +24,43 @@ Parameters:
   GitHubUser:
     Type: String
     Description: The Github User/Organisation under which the repository is hosted.
-    Default: microservices-today
+    Default: john
   TagName:
     Type: String
     Description: Tag name for the cloudformation stack
-    Default: microservices-today-serverless
+    Default: john-nginx
+  Region:
+    Type: String
+    Description: The region to which the app is to be deployed.
+    Default: ap-southeast-1
+  S3BucketName:
+    Type: String
+    Description: A bucket in the region which is planned for app deployment.
 
 Resources:
+  CloudFormationExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub cfn-${TagName}
+      Path: /
+      AssumeRolePolicyDocument: |
+        {
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": { "Service": [ "cloudformation.amazonaws.com" ]},
+                "Action": [ "sts:AssumeRole" ]
+            }]
+        }
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - s3:*
+                  - iam:*
   CFNRole:
     Type: AWS::IAM::Role
     Properties:
@@ -88,6 +118,8 @@ Resources:
                 Effect: Allow
                 Action:
                   - ecr:*
+                  - cloudformation:*
+                  - '*'
 
   CodePipelineServiceRole:
     Type: AWS::IAM::Role
@@ -183,7 +215,11 @@ Resources:
           - Name: TAG_NAME
             Value: !Ref TagName
           - Name: ARTIFACT_BUCKET
-            Value: !Ref ArtifactBucket
+            Value: !Ref S3BucketName
+          - Name: STACK_NAME
+            Value: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
+          - Name: REGION
+            Value: !Ref Region
       ServiceRole: !Ref CodeBuildServiceRole
   
   Pipeline:
@@ -225,40 +261,40 @@ Resources:
               OutputArtifacts:
                 - Name: BuildOutput
               RunOrder: 3
-        - Name: Execute
-          Actions:
-            - Name: Execute
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: CloudFormation
-              InputArtifacts:
-                - Name: BuildOutput
-              Configuration:
-                  ActionMode: CHANGE_SET_REPLACE
-                  RoleArn: !GetAtt [CFNRole, Arn]
-                  StackName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
-                  Capabilities: CAPABILITY_IAM
-                  ChangeSetName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
-                  TemplatePath: BuildOutput::NewSamTemplate.yaml
-              RunOrder: 4
-        - Name: Deploy
-          Actions:
-            - Name: Deploy
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: CloudFormation
-              InputArtifacts:
-                - Name: BuildOutput
-              Configuration:
-                  ActionMode: CHANGE_SET_EXECUTE
-                  RoleArn: !GetAtt [CFNRole, Arn]
-                  StackName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
-                  ChangeSetName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
-              RunOrder: 4
+        # - Name: Execute
+        #   Actions:
+        #     - Name: Execute
+        #       ActionTypeId:
+        #         Category: Deploy
+        #         Owner: AWS
+        #         Version: 1
+        #         Provider: CloudFormation
+        #       InputArtifacts:
+        #         - Name: BuildOutput
+        #       Configuration:
+        #           ActionMode: CHANGE_SET_REPLACE
+        #           RoleArn: !GetAtt [CFNRole, Arn]
+        #           StackName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
+        #           Capabilities: CAPABILITY_IAM
+        #           ChangeSetName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
+        #           TemplatePath: BuildOutput::NewSamTemplate.yaml
+        #       RunOrder: 4
+        # - Name: Deploy
+        #   Actions:
+        #     - Name: Deploy
+        #       ActionTypeId:
+        #         Category: Deploy
+        #         Owner: AWS
+        #         Version: 1
+        #         Provider: CloudFormation
+        #       InputArtifacts:
+        #         - Name: BuildOutput
+        #       Configuration:
+        #           ActionMode: CHANGE_SET_EXECUTE
+        #           RoleArn: !GetAtt [CFNRole, Arn]
+        #           StackName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
+        #           ChangeSetName: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
+        #       RunOrder: 4
 Outputs:
   PipelineUrl:
     Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}
