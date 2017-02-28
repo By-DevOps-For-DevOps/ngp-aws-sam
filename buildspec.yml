@@ -7,7 +7,7 @@ phases:
                                    --output-template-file NewSamTemplate.yaml
   post_build:
     commands:
-      - aws cloudformation deploy --template-file NewSamTemplate.yaml --stack-name ${STACK_NAME} 
+      - export AWS_DEFAULT_REGION=${REGION} && aws cloudformation deploy --template-file NewSamTemplate.yaml --stack-name ${STACK_NAME} 
                                   --capabilities CAPABILITY_IAM
 artifacts:
   type: zip
