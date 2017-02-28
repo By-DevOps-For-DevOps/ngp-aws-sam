@@ -13,7 +13,7 @@ Parameters:
   GitHubRepo:
     Type: String
     Description: Github repo name (e.g. github.com/Org/RepoName then RepoName)
-    Default: nginx
+    Default: ngp-aws-sam
   GitHubBranch:
     Type: String
     Default: master
@@ -24,36 +24,13 @@ Parameters:
   GitHubUser:
     Type: String
     Description: The Github User/Organisation under which the repository is hosted.
-    Default: john
+    Default: microservices-today
   TagName:
     Type: String
     Description: Tag name for the cloudformation stack
-    Default: john-nginx
+    Default: microservices-today-serverless
 
 Resources:
-  CloudFormationExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub cfn-${TagName}
-      Path: /
-      AssumeRolePolicyDocument: |
-        {
-            "Statement": [{
-                "Effect": "Allow",
-                "Principal": { "Service": [ "cloudformation.amazonaws.com" ]},
-                "Action": [ "sts:AssumeRole" ]
-            }]
-        }
-      Policies:
-        - PolicyName: root
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Resource: "*"
-                Effect: Allow
-                Action:
-                  - s3:*
-                  - iam:*
   CFNRole:
     Type: AWS::IAM::Role
     Properties:
