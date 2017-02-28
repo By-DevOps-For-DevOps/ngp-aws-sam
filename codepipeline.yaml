@@ -13,7 +13,7 @@ Parameters:
   GitHubRepo:
     Type: String
     Description: Github repo name (e.g. github.com/Org/RepoName then RepoName)
-    Default: nginx
+    Default: ngp-aws-sam
   GitHubBranch:
     Type: String
     Default: master
@@ -24,43 +24,17 @@ Parameters:
   GitHubUser:
     Type: String
     Description: The Github User/Organisation under which the repository is hosted.
-    Default: john
+    Default: microservices-today
   TagName:
     Type: String
     Description: Tag name for the cloudformation stack
-    Default: john-nginx
+    Default: microservices-today-serverless
   Region:
     Type: String
     Description: The region to which the app is to be deployed.
-    Default: ap-southeast-1
-  S3BucketName:
-    Type: String
-    Description: A bucket in the region which is planned for app deployment.
+    Default: ap-northeast-1
 
 Resources:
-  CloudFormationExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub cfn-${TagName}
-      Path: /
-      AssumeRolePolicyDocument: |
-        {
-            "Statement": [{
-                "Effect": "Allow",
-                "Principal": { "Service": [ "cloudformation.amazonaws.com" ]},
-                "Action": [ "sts:AssumeRole" ]
-            }]
-        }
-      Policies:
-        - PolicyName: root
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Resource: "*"
-                Effect: Allow
-                Action:
-                  - s3:*
-                  - iam:*
   CFNRole:
     Type: AWS::IAM::Role
     Properties:
@@ -214,8 +188,6 @@ Resources:
             Value: !Ref GitHubToken
           - Name: TAG_NAME
             Value: !Ref TagName
-          - Name: ARTIFACT_BUCKET
-            Value: !Ref S3BucketName
           - Name: STACK_NAME
             Value: !Join ["-", ["Ref":"AWS::StackName", "sam"]]
           - Name: REGION
