@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Outputs the time
+Description: Hello World
 Resources:
-  TimeFunction:
+  HelloWorldFunction:
     Type: AWS::Serverless::Function
     Properties:
       Handler: index.handler
       Runtime: nodejs4.3
       CodeUri: ./
       Events:
-        MyTimeApi:
+        MyHelloWorldApi:
           Type: Api
           Properties:
-            Path: /TimeResource
+            Path: /HelloWorld
             Method: GET

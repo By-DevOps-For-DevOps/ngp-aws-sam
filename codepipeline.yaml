@@ -16,8 +16,8 @@ Parameters:
     Default: ngp-aws-sam
   GitHubBranch:
     Type: String
-    Default: master
     Description: The github branch to monitor for changes.
+    Default: master
   GitHubToken:
     Type: String
     Description: The Github Token which has access to the repository.
@@ -218,9 +218,9 @@ Resources:
               OutputArtifacts:
                 - Name: App
               RunOrder: 1
-        - Name: Build
+        - Name: BuildAndDeploy
           Actions:
-            - Name: Build
+            - Name: BuildAndDeploy
               ActionTypeId:
                 Category: Build
                 Owner: AWS
