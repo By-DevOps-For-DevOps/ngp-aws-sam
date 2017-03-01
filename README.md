@@ -2,7 +2,7 @@
 
 ### Pre-requisites
 1. An S3 Bucket in region where we need to deploy the lambda function.
-2. Github access token to access the repository containing the lambda function.
+2. Github access token to access the repository containing the lambda function (check `repo` and `admin:repo_hook`)
 
 ### Steps to install
 1. Add the `buildspec.yaml` and `samTemplate.yaml` to Github repo containing Lambda function.
