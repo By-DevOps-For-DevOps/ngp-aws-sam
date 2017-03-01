@@ -3,11 +3,11 @@ phases:
   install:
     commands:
       - npm install
-      - aws cloudformation package --template-file samTemplate.yaml --s3-bucket ${ARTIFACT_BUCKET} 
-                                   --output-template-file NewSamTemplate.yaml
+      - aws s3 mb s3://${STACK_NAME}-app-artifact --region ${REGION} || true
+      - aws cloudformation package --template-file samTemplate.yaml --s3-bucket ${STACK_NAME}-app-artifact --output-template-file NewSamTemplate.yaml
   post_build:
     commands:
-      - export AWS_DEFAULT_REGION=${REGION} && aws cloudformation deploy --template-file NewSamTemplate.yaml --stack-name ${STACK_NAME} 
+      - aws --region ${REGION} cloudformation deploy --template-file NewSamTemplate.yaml --stack-name ${STACK_NAME}
                                   --capabilities CAPABILITY_IAM
 artifacts:
   type: zip
