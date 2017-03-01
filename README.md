@@ -1,6 +1,7 @@
 # ngp-aws-sam
 The Stack will create a CodePipeline which will deploy the Lambda 
 function and create an API gateway endpoint pointing towards it.
+
 ### Pre-requisites
 1. GitHub Token with `admin:repo_hook` and `repo` scopes to access the 
 repository containing the lambda function.
