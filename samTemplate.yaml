@@ -12,5 +12,5 @@ Resources:
         MyHelloWorldApi:
           Type: Api
           Properties:
-            Path: /HelloWorld
+            Path: /Hello
             Method: GET
